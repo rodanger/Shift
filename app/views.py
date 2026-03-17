@@ -18,15 +18,11 @@ from .excel import generate_invoice_xlsx
 
 # ── Auth ──────────────────────────────────────────────────────────
 
-    
 class HomeView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         return Response({'message': 'Bienvenido a Shift!'})
-
-
-
 
 
 class RegisterView(generics.CreateAPIView):
@@ -52,12 +48,15 @@ class ShiftListCreateView(generics.ListCreateAPIView):
         qs = Shift.objects.filter(user=self.request.user)
         p  = self.request.query_params
 
-        if p.get('year'):    qs = qs.filter(date__year=p['year'])
-        if p.get('month'):   qs = qs.filter(date__month=p['month'])
-        if p.get('status'):  qs = qs.filter(status=p['status'])
-        if p.get('client'):  qs = qs.filter(client__icontains=p['client'])
+        if p.get('year'):      qs = qs.filter(date__year=p['year'])
+        if p.get('month'):     qs = qs.filter(date__month=p['month'])
+        if p.get('status'):    qs = qs.filter(status=p['status'])
+        if p.get('client'):    qs = qs.filter(client__icontains=p['client'])
         if p.get('date_from'): qs = qs.filter(date__gte=p['date_from'])
         if p.get('date_to'):   qs = qs.filter(date__lte=p['date_to'])
+
+        ordering = p.get('ordering', '-date')
+        qs = qs.order_by(ordering)
 
         return qs
 
@@ -136,12 +135,14 @@ class InvoiceGenerateView(APIView):
         year  = data['year']
         month = data['month']
 
+        # ── Evitar factura duplicada para el mismo usuario/mes ──
         if Invoice.objects.filter(user=user, period_year=year, period_month=month).exists():
             return Response(
                 {'detail': f'Ya existe una factura para {year}-{month:02d}.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # ── Verificar que haya turnos pendientes ──
         pending = Shift.objects.filter(
             user=user, date__year=year,
             date__month=month, status='pending'
@@ -152,8 +153,9 @@ class InvoiceGenerateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # ── Generar número único: user_id + año + mes + correlativo del usuario ──
         count          = Invoice.objects.filter(user=user).count() + 1
-        invoice_number = f'INV-{year}-{month:02d}-{count:03d}'
+        invoice_number = f'INV-U{user.id}-{year}-{month:02d}-{count:03d}'
 
         invoice = Invoice.objects.create(
             user           = user,
