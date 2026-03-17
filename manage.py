@@ -3,7 +3,7 @@ import os
 import sys
 
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shift.settings')
     
     # Add the project root to sys.path so 'apps' is importable
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
