@@ -1,0 +1,505 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shift &amp; Invoice Tracker</title>
+
+  <!-- Bootstrap CSS (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <!-- Google Fonts (CDN) -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+  <!-- ✅ App stylesheet served by Django static files -->
+  <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+</head>
+<body>
+
+  <!-- ── AUTH SCREEN ──────────────────────────────── -->
+  <div id="screen-auth" class="screen">
+    <div class="auth-bg">
+      <div class="auth-card">
+        <div class="auth-logo mb-4">
+          <span class="logo-icon"><i class="bi bi-calendar2-week-fill"></i></span>
+          <div>
+            <h1 class="auth-title">Shift &amp; Invoice</h1>
+            <p class="auth-sub">Tracker para trabajadores por hora</p>
+          </div>
+        </div>
+
+        <!-- tabs -->
+        <ul class="nav nav-pills auth-tabs mb-4" id="authTabs">
+          <li class="nav-item flex-fill">
+            <button class="nav-link active w-100" id="tab-login-btn" onclick="switchAuthTab('login')">
+              Iniciar sesión
+            </button>
+          </li>
+          <li class="nav-item flex-fill">
+            <button class="nav-link w-100" id="tab-register-btn" onclick="switchAuthTab('register')">
+              Registrarse
+            </button>
+          </li>
+        </ul>
+
+        <!-- login form -->
+        <form id="form-login" onsubmit="handleLogin(event)">
+          <div class="mb-3">
+            <label class="form-label">Usuario</label>
+            <input type="text" class="form-control sit-input" id="login-email" placeholder="username" required/>
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control sit-input" id="login-password" placeholder="••••••••" required/>
+          </div>
+          <div id="login-error" class="alert alert-danger d-none py-2 small"></div>
+          <button type="submit" class="btn sit-btn-primary w-100" id="login-btn">
+            <span class="btn-text">Entrar</span>
+            <span class="btn-spinner spinner-border spinner-border-sm d-none ms-2"></span>
+          </button>
+        </form>
+
+        <!-- register form -->
+        <form id="form-register" class="d-none" onsubmit="handleRegister(event)">
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label">Usuario</label>
+              <input type="text" class="form-control sit-input" id="reg-username" placeholder="username" required/>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Nombre completo</label>
+              <input type="text" class="form-control sit-input" id="reg-fullname" placeholder="Tu nombre"/>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control sit-input" id="reg-email" placeholder="tu@email.com" required/>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-8">
+              <label class="form-label">Tarifa por hora</label>
+              <input type="number" step="0.01" class="form-control sit-input" id="reg-rate" placeholder="25.00"/>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Moneda</label>
+              <select class="form-select sit-input" id="reg-currency">
+                <option>USD</option><option>EUR</option><option>GBP</option>
+                <option selected>CAD</option><option>MXN</option><option>ARS</option>
+              </select>
+            </div>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <label class="form-label">Contraseña</label>
+              <input type="password" class="form-control sit-input" id="reg-password" required/>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Confirmar</label>
+              <input type="password" class="form-control sit-input" id="reg-password2" required/>
+            </div>
+          </div>
+          <div id="reg-error" class="alert alert-danger d-none py-2 small"></div>
+          <button type="submit" class="btn sit-btn-primary w-100" id="reg-btn">
+            <span class="btn-text">Crear cuenta</span>
+            <span class="btn-spinner spinner-border spinner-border-sm d-none ms-2"></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN APP ──────────────────────────────────── -->
+  <div id="screen-app" class="screen d-none">
+
+    <!-- Sidebar -->
+    <aside class="sit-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="logo-icon-sm"><i class="bi bi-calendar2-week-fill"></i></span>
+        <span class="sidebar-brand">SIT</span>
+        <button class="btn btn-link sidebar-close d-lg-none ms-auto" onclick="toggleSidebar()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="sidebar-link active" data-page="dashboard" onclick="navigate('dashboard')">
+          <i class="bi bi-grid-1x2-fill"></i> Dashboard
+        </a>
+        <a class="sidebar-link" data-page="shifts" onclick="navigate('shifts')">
+          <i class="bi bi-clock-fill"></i> Turnos
+        </a>
+        <a class="sidebar-link" data-page="invoices" onclick="navigate('invoices')">
+          <i class="bi bi-receipt-cutoff"></i> Facturas
+        </a>
+        <a class="sidebar-link" data-page="profile" onclick="navigate('profile')">
+          <i class="bi bi-person-fill"></i> Perfil
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="d-flex align-items-center gap-2 px-3 py-2">
+          <div class="avatar-sm" id="sidebar-avatar">?</div>
+          <div class="flex-fill overflow-hidden">
+            <div class="sidebar-user-name text-truncate" id="sidebar-username">–</div>
+            <div class="sidebar-user-role">Trabajador</div>
+          </div>
+          <button class="btn btn-link p-0 text-secondary" title="Cerrar sesión" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="sit-main" id="main-content">
+
+      <!-- Topbar -->
+      <header class="sit-topbar">
+        <button class="btn btn-link d-lg-none me-2 p-0" onclick="toggleSidebar()">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <h2 class="topbar-title" id="page-title">Dashboard</h2>
+        <div class="ms-auto d-flex gap-2">
+          <button class="btn sit-btn-ghost d-none" id="btn-new-shift" onclick="openShiftModal()">
+            <i class="bi bi-plus-lg me-1"></i> Nuevo turno
+          </button>
+          <button class="btn sit-btn-ghost d-none" id="btn-gen-invoice" onclick="openInvoiceModal()">
+            <i class="bi bi-lightning-fill me-1"></i> Generar factura
+          </button>
+        </div>
+      </header>
+
+      <!-- Pages -->
+      <main class="sit-page">
+
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="page-section">
+          <div class="row g-3 mb-4" id="dash-stats-row">
+            <div class="col-6 col-md-3">
+              <div class="stat-card">
+                <div class="stat-label">Turnos este mes</div>
+                <div class="stat-value" id="stat-shifts">–</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card">
+                <div class="stat-label">Horas trabajadas</div>
+                <div class="stat-value" id="stat-hours">–</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card accent">
+                <div class="stat-label">Ingresos del mes</div>
+                <div class="stat-value" id="stat-pay">–</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card">
+                <div class="stat-label">Facturas pendientes</div>
+                <div class="stat-value" id="stat-invoices">–</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-lg-7">
+              <div class="sit-card h-100">
+                <div class="sit-card-header">
+                  <span>Turnos recientes</span>
+                  <button class="btn btn-link btn-sm p-0" onclick="navigate('shifts')">Ver todos →</button>
+                </div>
+                <div id="dash-recent-shifts">
+                  <div class="empty-state"><i class="bi bi-clock"></i><p>Sin turnos aún</p></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="sit-card h-100">
+                <div class="sit-card-header">
+                  <span>Facturas recientes</span>
+                  <button class="btn btn-link btn-sm p-0" onclick="navigate('invoices')">Ver todas →</button>
+                </div>
+                <div id="dash-recent-invoices">
+                  <div class="empty-state"><i class="bi bi-receipt"></i><p>Sin facturas aún</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SHIFTS -->
+        <section id="page-shifts" class="page-section d-none">
+          <div class="sit-card mb-3">
+            <div class="row g-2 align-items-end">
+              <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">Año</label>
+                <select class="form-select sit-input form-select-sm" id="filter-year"></select>
+              </div>
+              <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">Mes</label>
+                <select class="form-select sit-input form-select-sm" id="filter-month">
+                  <option value="">Todos</option>
+                  <option value="1">Enero</option><option value="2">Febrero</option>
+                  <option value="3">Marzo</option><option value="4">Abril</option>
+                  <option value="5">Mayo</option><option value="6">Junio</option>
+                  <option value="7">Julio</option><option value="8">Agosto</option>
+                  <option value="9">Septiembre</option><option value="10">Octubre</option>
+                  <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                </select>
+              </div>
+              <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">Estado</label>
+                <select class="form-select sit-input form-select-sm" id="filter-status">
+                  <option value="">Todos</option>
+                  <option value="pending">Pendiente</option>
+                  <option value="invoiced">Facturado</option>
+                  <option value="paid">Pagado</option>
+                </select>
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label small mb-1">Cliente</label>
+                <input type="text" class="form-control sit-input form-control-sm" id="filter-client" placeholder="Buscar cliente…"/>
+              </div>
+              <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn sit-btn-primary btn-sm flex-fill" onclick="loadShifts()">
+                  <i class="bi bi-funnel-fill me-1"></i>Filtrar
+                </button>
+                <button class="btn sit-btn-ghost btn-sm" onclick="clearFilters()">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 flex-wrap" id="shifts-summary-bar"></div>
+
+          <div class="sit-card p-0">
+            <div class="table-responsive">
+              <table class="table sit-table mb-0">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Horario</th>
+                    <th>Cliente / Rol</th>
+                    <th class="text-end">Horas</th>
+                    <th class="text-end">Total</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="shifts-tbody">
+                  <tr><td colspan="7" class="text-center py-5 text-muted">Cargando…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- INVOICES -->
+        <section id="page-invoices" class="page-section d-none">
+          <div id="invoices-list" class="row g-3">
+            <div class="col-12 text-center py-5 text-muted">Cargando…</div>
+          </div>
+        </section>
+
+        <!-- PROFILE -->
+        <section id="page-profile" class="page-section d-none">
+          <div class="row justify-content-center">
+            <div class="col-lg-7">
+              <div class="sit-card">
+                <h5 class="mb-4 fw-500">Datos del perfil</h5>
+                <form id="form-profile" onsubmit="saveProfile(event)">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Nombre completo</label>
+                      <input type="text" class="form-control sit-input" id="p-fullname"/>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Teléfono</label>
+                      <input type="text" class="form-control sit-input" id="p-phone"/>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Tarifa por hora</label>
+                      <input type="number" step="0.01" class="form-control sit-input" id="p-rate"/>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Moneda</label>
+                      <select class="form-select sit-input" id="p-currency">
+                        <option>USD</option><option>EUR</option><option>GBP</option>
+                        <option selected>CAD</option><option>MXN</option><option>ARS</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Prefijo factura</label>
+                      <input type="text" class="form-control sit-input" id="p-prefix" maxlength="10"/>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Dirección</label>
+                      <textarea class="form-control sit-input" id="p-address" rows="2"></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Datos bancarios <span class="text-muted">(aparecen en facturas)</span></label>
+                      <textarea class="form-control sit-input" id="p-bank" rows="3"></textarea>
+                    </div>
+                  </div>
+                  <div id="profile-msg" class="alert d-none mt-3 py-2 small"></div>
+                  <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn sit-btn-primary px-4">
+                      <i class="bi bi-check2 me-1"></i>Guardar cambios
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ── MODAL: NEW / EDIT SHIFT ───────────────────── -->
+  <div class="modal fade" id="modal-shift" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content sit-modal">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shift-modal-title">Nuevo turno</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="form-shift" onsubmit="saveShift(event)">
+          <div class="modal-body">
+            <input type="hidden" id="shift-id"/>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Fecha <span class="text-danger">*</span></label>
+                <input type="date" class="form-control sit-input" id="shift-date" required/>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Hora inicio <span class="text-danger">*</span></label>
+                <input type="time" class="form-control sit-input" id="shift-start" required/>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Hora fin <span class="text-danger">*</span></label>
+                <input type="time" class="form-control sit-input" id="shift-end" required/>
+              </div>
+              <div class="col-8">
+                <label class="form-label">Tarifa/hora <span class="text-danger">*</span></label>
+                <input type="number" step="0.01" class="form-control sit-input" id="shift-rate" required/>
+              </div>
+              <div class="col-4 d-flex align-items-end">
+                <div class="shift-calc-preview w-100 text-center">
+                  <div class="small text-muted">Total</div>
+                  <div class="fw-500 fs-5" id="shift-preview-total">–</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Cliente</label>
+                <input type="text" class="form-control sit-input" id="shift-client" placeholder="Empresa / Evento"/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Rol</label>
+                <input type="text" class="form-control sit-input" id="shift-role" placeholder="Bartender, Staff…"/>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Ubicación</label>
+                <input type="text" class="form-control sit-input" id="shift-location"/>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Notas</label>
+                <textarea class="form-control sit-input" id="shift-notes" rows="2"></textarea>
+              </div>
+            </div>
+            <div id="shift-error" class="alert alert-danger d-none mt-3 py-2 small"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn sit-btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn sit-btn-primary px-4" id="shift-save-btn">
+              <span class="btn-text">Guardar</span>
+              <span class="btn-spinner spinner-border spinner-border-sm d-none ms-2"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL: GENERATE INVOICE ───────────────────── -->
+  <div class="modal fade" id="modal-invoice" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content sit-modal">
+        <div class="modal-header">
+          <h5 class="modal-title">Generar factura</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="form-invoice" onsubmit="generateInvoice(event)">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="form-label">Año <span class="text-danger">*</span></label>
+                <input type="number" class="form-control sit-input" id="inv-year" required/>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Mes <span class="text-danger">*</span></label>
+                <select class="form-select sit-input" id="inv-month" required>
+                  <option value="1">Enero</option><option value="2">Febrero</option>
+                  <option value="3">Marzo</option><option value="4">Abril</option>
+                  <option value="5">Mayo</option><option value="6">Junio</option>
+                  <option value="7">Julio</option><option value="8">Agosto</option>
+                  <option value="9">Septiembre</option><option value="10">Octubre</option>
+                  <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Cliente / empresa</label>
+                <input type="text" class="form-control sit-input" id="inv-client"/>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Dirección del cliente</label>
+                <textarea class="form-control sit-input" id="inv-client-addr" rows="2"></textarea>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Impuesto (ej. 0.13 = 13%)</label>
+                <input type="number" step="0.01" min="0" max="1" class="form-control sit-input" id="inv-tax" value="0"/>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Fecha vencimiento</label>
+                <input type="date" class="form-control sit-input" id="inv-due"/>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Notas de factura</label>
+                <textarea class="form-control sit-input" id="inv-notes" rows="2"></textarea>
+              </div>
+            </div>
+            <div id="invoice-error" class="alert alert-danger d-none mt-3 py-2 small"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn sit-btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn sit-btn-primary px-4" id="invoice-gen-btn">
+              <span class="btn-text"><i class="bi bi-lightning-fill me-1"></i>Generar</span>
+              <span class="btn-spinner spinner-border spinner-border-sm d-none ms-2"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ─────────────────────────────────────── -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+    <div id="sit-toast" class="toast align-items-center border-0 sit-toast" role="alert">
+      <div class="d-flex">
+        <div class="toast-body" id="toast-msg">Mensaje</div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ✅ App JS served by Django static files -->
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>
