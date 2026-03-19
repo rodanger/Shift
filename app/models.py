@@ -87,3 +87,17 @@ class Invoice(models.Model):
         self.tax_amount = tax_amount
         self.total      = (subtotal + tax_amount).quantize(Decimal('0.01'))
         self.save(update_fields=['subtotal', 'tax_amount', 'total', 'updated_at'])
+
+
+class UserProfile(models.Model):
+    user           = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    full_name      = models.CharField(max_length=200, blank=True)
+    phone          = models.CharField(max_length=50, blank=True)
+    default_rate   = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    currency       = models.CharField(max_length=10, default='CAD')
+    invoice_prefix = models.CharField(max_length=10, default='INV')
+    address        = models.TextField(blank=True)
+    bank_details   = models.TextField(blank=True)
+
+    def __str__(self):
+        return f'Profile — {self.user.username}'

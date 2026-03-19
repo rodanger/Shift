@@ -1,8 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-
-from .models import Shift, Invoice
+from .models import Shift, Invoice, UserProfile
 
 
 # ── Auth ──────────────────────────────────────────────────────────
@@ -10,8 +9,6 @@ from .models import Shift, Invoice
 class RegisterSerializer(serializers.ModelSerializer):
     password  = serializers.CharField(write_only=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, label='Confirm password')
-
-    # Extra fields sent by the frontend (stored in first_name for simplicity)
     full_name    = serializers.CharField(required=False, allow_blank=True, write_only=True)
     default_rate = serializers.CharField(required=False, allow_blank=True, write_only=True)
     currency     = serializers.CharField(required=False, allow_blank=True, write_only=True)
@@ -23,31 +20,45 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs['password'] != attrs.pop('password2'):
-            raise serializers.ValidationError({'password': 'Las contraseñas no coinciden.'})
-        # Remove extra fields not in the User model before create
-        attrs.pop('default_rate', None)
-        attrs.pop('currency', None)
-        full_name = attrs.pop('full_name', '')
-        if full_name:
-            parts = full_name.split(' ', 1)
-            attrs['first_name'] = parts[0]
-            attrs['last_name']  = parts[1] if len(parts) > 1 else ''
+            raise serializers.ValidationError({'password': 'Passwords do not match.'})
         return attrs
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        full_name    = validated_data.pop('full_name', '')
+        default_rate = validated_data.pop('default_rate', None)
+        currency     = validated_data.pop('currency', 'CAD')
+
+        user = User.objects.create_user(**validated_data)
+
+        # Create profile with the extra fields
+        UserProfile.objects.create(
+            user=user,
+            full_name=full_name,
+            default_rate=default_rate or None,
+            currency=currency,
+        )
+        return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
+    username = serializers.CharField(source='user.username', read_only=True)
+    email    = serializers.CharField(source='user.email', read_only=True)
 
     class Meta:
-        model  = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'full_name')
-        read_only_fields = ('id', 'email')
+        model  = UserProfile
+        fields = (
+            'username', 'email',
+            'full_name', 'phone', 'default_rate', 'currency',
+            'invoice_prefix', 'address', 'bank_details',
+        )
 
-    def get_full_name(self, obj):
-        return f'{obj.first_name} {obj.last_name}'.strip() or obj.username
+    def update(self, instance, validated_data):
+        # Remove nested user fields if they sneak in
+        validated_data.pop('user', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 # ── Shifts ────────────────────────────────────────────────────────
@@ -100,5 +111,5 @@ class InvoiceGenerateSerializer(serializers.Serializer):
 
 class InvoiceStatusSerializer(serializers.Serializer):
     STATUS_CHOICES = ['draft', 'sent', 'paid', 'void']
-    status   = serializers.ChoiceField(choices=STATUS_CHOICES)
+    status    = serializers.ChoiceField(choices=STATUS_CHOICES)
     paid_date = serializers.DateField(required=False, allow_null=True)

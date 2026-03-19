@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Shift, Invoice
+from .models import Shift, Invoice, UserProfile
 from .serializers import (
     RegisterSerializer, UserProfileSerializer,
     ShiftSerializer,
@@ -22,7 +22,7 @@ class HomeView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        return Response({'message': 'Bienvenido a Shift!'})
+        return Response({'message': 'Welcome to Shift!'})
 
 
 class RegisterView(generics.CreateAPIView):
@@ -35,7 +35,12 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        return self.request.user
+        profile, _ = UserProfile.objects.get_or_create(user=self.request.user)
+        return profile
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 # ── Shifts ────────────────────────────────────────────────────────
@@ -72,7 +77,7 @@ class ShiftDetailView(generics.RetrieveUpdateDestroyAPIView):
         shift = self.get_object()
         if shift.status != 'pending':
             return Response(
-                {'detail': 'Solo se pueden eliminar turnos en estado pendiente.'},
+                {'detail': 'Only pending shifts can be deleted.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         return super().destroy(request, *args, **kwargs)
@@ -135,27 +140,30 @@ class InvoiceGenerateView(APIView):
         year  = data['year']
         month = data['month']
 
-        # ── Evitar factura duplicada para el mismo usuario/mes ──
         if Invoice.objects.filter(user=user, period_year=year, period_month=month).exists():
             return Response(
-                {'detail': f'Ya existe una factura para {year}-{month:02d}.'},
+                {'detail': f'An invoice already exists for {year}-{month:02d}.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # ── Verificar que haya turnos pendientes ──
         pending = Shift.objects.filter(
             user=user, date__year=year,
             date__month=month, status='pending'
         )
         if not pending.exists():
             return Response(
-                {'detail': 'No hay turnos pendientes para este período.'},
+                {'detail': 'No pending shifts found for this period.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # ── Generar número único: user_id + año + mes + correlativo del usuario ──
+        # Use invoice_prefix from profile if available
+        try:
+            prefix = user.profile.invoice_prefix or 'INV'
+        except UserProfile.DoesNotExist:
+            prefix = 'INV'
+
         count          = Invoice.objects.filter(user=user).count() + 1
-        invoice_number = f'INV-U{user.id}-{year}-{month:02d}-{count:03d}'
+        invoice_number = f'{prefix}-U{user.id}-{year}-{month:02d}-{count:03d}'
 
         invoice = Invoice.objects.create(
             user           = user,
@@ -182,7 +190,7 @@ class InvoiceStatusView(APIView):
         try:
             invoice = Invoice.objects.get(pk=pk, user=request.user)
         except Invoice.DoesNotExist:
-            return Response({'detail': 'No encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = InvoiceStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -207,11 +215,11 @@ class InvoiceDeleteView(APIView):
         try:
             invoice = Invoice.objects.get(pk=pk, user=request.user)
         except Invoice.DoesNotExist:
-            return Response({'detail': 'No encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         if invoice.status not in ('draft', 'void'):
             return Response(
-                {'detail': 'Solo se pueden eliminar facturas en borrador o anuladas.'},
+                {'detail': 'Only draft or void invoices can be deleted.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -232,7 +240,7 @@ class InvoiceExcelView(APIView):
                 .get(pk=pk, user=request.user)
             )
         except Invoice.DoesNotExist:
-            return Response({'detail': 'No encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         xlsx_bytes = generate_invoice_xlsx(invoice)
         response   = HttpResponse(

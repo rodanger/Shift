@@ -4,14 +4,14 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side, Gradient
 from openpyxl.utils import get_column_letter
 
 # ── Colours from the template ─────────────────────────────────────
-GREEN_HEADER  = '00B050'   # dark green title bar
-GREEN_LIGHT   = 'E2EFDA'   # light green alternating rows
-GREEN_MID     = '92D050'   # medium green (section headers)
-YELLOW_WARN   = 'FFFF00'   # yellow warning bar
-BLUE_LINK     = '0070C0'   # email / link colour
+GREEN_HEADER  = '00B050'
+GREEN_LIGHT   = 'E2EFDA'
+GREEN_MID     = '92D050'
+YELLOW_WARN   = 'FFFF00'
+BLUE_LINK     = '0070C0'
 WHITE         = 'FFFFFF'
 BLACK         = '000000'
-DARK_GREEN    = '375623'   # text on green header
+DARK_GREEN    = '375623'
 
 def _side(style='thin'):
     return Side(style=style)
@@ -56,10 +56,8 @@ def generate_invoice_xlsx(invoice) -> bytes:
               'July','August','September','October','November','December']
     period_name = MONTHS[invoice.period_month]
 
-    # ── Column widths (A–I) ───────────────────────────────────────
-    # A=#  B=DATE  C=CLIENT/EVENT  D=POS  E=TIME_IN  F=TIME_OUT
-    # G=HOURS  H=TRAVEL  I=RATE  J=TOTAL
-    col_widths = [4, 12, 28, 6, 10, 10, 8, 8, 8, 10]
+    # ── Column widths (A–J) ───────────────────────────────────────
+    col_widths = [4, 18, 32, 10, 10, 10, 8, 8, 8, 10]
     for i, w in enumerate(col_widths, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
 
@@ -68,16 +66,16 @@ def generate_invoice_xlsx(invoice) -> bytes:
     ws.merge_cells('A1:G1')
     _set(ws, 1, 1,
          value='Subcontractors Invoice Form - Staff Your Event Inc.',
-         bold=True, size=11, color=WHITE,
-         h='left', fill=_fill(GREEN_HEADER),
+         bold=True, size=11, color=BLACK,
+         h='left', fill=_fill(GREEN_LIGHT),
          border=_border())
 
     ws.merge_cells('H1:J1')
     c = ws.cell(row=1, column=8)
     c.value        = f'Invoice Period: {period_name}'
-    c.font         = _font(bold=True, size=10, color=WHITE)
+    c.font         = _font(bold=True, size=10, color=BLACK)
     c.alignment    = _align(h='right')
-    c.fill         = _fill(GREEN_HEADER)
+    c.fill         = _fill(GREEN_LIGHT)
     c.border       = _border()
 
     # ── ROW 2: "Current Personal Information" ─────────────────────
@@ -85,14 +83,14 @@ def generate_invoice_xlsx(invoice) -> bytes:
     ws.merge_cells('A2:J2')
     _set(ws, 2, 1, value='Current Personal Information',
          bold=True, size=10, color=BLACK,
-         h='left', fill=_fill(GREEN_MID), border=_border())
+         h='left', fill=_fill(GREEN_LIGHT), border=_border())
 
     # ── ROW 3: Name + Email ───────────────────────────────────────
     ws.row_dimensions[3].height = 16
     full_name = f'{user.first_name} {user.last_name}'.strip() or user.username
 
     _set(ws, 3, 1, value='Name:', bold=True, size=9)
-    ws.merge_cells('B3:D3')
+    ws.merge_cells('B3:E3')                          # ← ampliado de D3 a E3
     _set(ws, 3, 2, value=full_name, size=9,
          fill=_fill(GREEN_LIGHT), border=_border())
 
@@ -106,7 +104,7 @@ def generate_invoice_xlsx(invoice) -> bytes:
     address = getattr(user, 'address', '') or ''
 
     _set(ws, 4, 1, value='Address:', bold=True, size=9)
-    ws.merge_cells('B4:D4')
+    ws.merge_cells('B4:E4')                          # ← ampliado de D4 a E4
     _set(ws, 4, 2, value=address, size=9,
          fill=_fill(GREEN_LIGHT), border=_border())
 
@@ -118,7 +116,7 @@ def generate_invoice_xlsx(invoice) -> bytes:
     # ── ROW 5: City + Cell Phone ──────────────────────────────────
     ws.row_dimensions[5].height = 16
     _set(ws, 5, 1, value='City:', bold=True, size=9)
-    ws.merge_cells('B5:D5')
+    ws.merge_cells('B5:E5')                          # ← ampliado de D5 a E5
     _set(ws, 5, 2, value='Toronto', size=9,
          fill=_fill(GREEN_LIGHT), border=_border())
 
@@ -130,7 +128,7 @@ def generate_invoice_xlsx(invoice) -> bytes:
     # ── ROW 6: Postal Code + Smart Serve ─────────────────────────
     ws.row_dimensions[6].height = 16
     _set(ws, 6, 1, value='Postal Code:', bold=True, size=9)
-    ws.merge_cells('B6:D6')
+    ws.merge_cells('B6:E6')                          # ← ampliado de D6 a E6
     _set(ws, 6, 2, value='', size=9,
          fill=_fill(GREEN_LIGHT), border=_border())
 
@@ -145,7 +143,7 @@ def generate_invoice_xlsx(invoice) -> bytes:
     _set(ws, 7, 1,
          value='INVOICES MUST BE SUBMITTED WITHIN THE FIRST 5 DAYS OF THE NEXT MONTH',
          bold=True, size=10, color=BLACK, h='center',
-         fill=_fill(YELLOW_WARN), border=_border())
+         fill=_fill(GREEN_LIGHT), border=_border())
 
     # ── ROW 8: Table header ───────────────────────────────────────
     ws.row_dimensions[8].height = 18
@@ -153,12 +151,12 @@ def generate_invoice_xlsx(invoice) -> bytes:
                'HOURS', 'TRAVEL', 'RATE', 'TOTAL']
     for col, h in enumerate(headers, 1):
         _set(ws, 8, col, value=h,
-             bold=True, size=9, color=WHITE, h='center',
-             fill=_fill(GREEN_HEADER), border=_border())
+             bold=True, size=9, color=BLACK, h='center',
+             fill=_fill(GREEN_LIGHT), border=_border())
 
     # ── ROW 9+: Shift data rows ───────────────────────────────────
     DATA_START = 9
-    NUM_ROWS   = 34   # template shows 34 data rows
+    NUM_ROWS   = 34
 
     for i in range(NUM_ROWS):
         r    = DATA_START + i
@@ -175,7 +173,7 @@ def generate_invoice_xlsx(invoice) -> bytes:
                 shift.start_time.strftime('%I:%M %p'),
                 shift.end_time.strftime('%I:%M %p'),
                 float(shift.hours_worked),
-                0,                          # TRAVEL — not in model, default 0
+                0,
                 float(shift.hourly_rate),
                 float(shift.total_pay),
             ]
@@ -200,14 +198,13 @@ def generate_invoice_xlsx(invoice) -> bytes:
                 cell.number_format = '"$"#,##0.00'
                 cell.alignment = _align(h='right')
                 if i < len(shifts):
-                    cell.fill = _fill('CCFFCC')  # highlight total column
+                    cell.fill = _fill('CCFFCC')
 
     # ── Footer rows ───────────────────────────────────────────────
-    LAST_DATA = DATA_START + NUM_ROWS   # row 43
+    LAST_DATA = DATA_START + NUM_ROWS
 
     ws.row_dimensions[LAST_DATA].height = 16
 
-    # "Mark below with X..." + Tax Rate + GST/HST
     ws.merge_cells(f'A{LAST_DATA}:E{LAST_DATA}')
     _set(ws, LAST_DATA, 1,
          value='Mark below with an \'X\' how to receive your cheque',
@@ -260,12 +257,12 @@ def generate_invoice_xlsx(invoice) -> bytes:
          value='*POS = Position worked (W = waiter, S = Supervisor, B = Bartender)',
          size=8, italic=True)
 
-    # ── Freeze panes below header ─────────────────────────────────
+    # ── Freeze panes ──────────────────────────────────────────────
     ws.freeze_panes = ws.cell(row=DATA_START, column=1)
 
     # ── Print area ────────────────────────────────────────────────
     ws.print_area = f'A1:J{NOTE_ROW}'
-    ws.page_setup.fitToPage = True
+    ws.page_setup.fitToPage  = True
     ws.page_setup.fitToWidth = 1
 
     buf = io.BytesIO()
