@@ -140,12 +140,6 @@ class InvoiceGenerateView(APIView):
         year  = data['year']
         month = data['month']
 
-        if Invoice.objects.filter(user=user, period_year=year, period_month=month).exists():
-            return Response(
-                {'detail': f'An invoice already exists for {year}-{month:02d}.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         pending = Shift.objects.filter(
             user=user, date__year=year,
             date__month=month, status='pending'
@@ -156,7 +150,6 @@ class InvoiceGenerateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Use invoice_prefix from profile if available
         try:
             prefix = user.profile.invoice_prefix or 'INV'
         except UserProfile.DoesNotExist:
