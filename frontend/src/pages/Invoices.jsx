@@ -85,16 +85,18 @@ export default function Invoices() {
     }
   }
 
-  const deleteInvoice = async (id, isDraft) => {
-    if (!isDraft) {
-      if (!confirm('Void this invoice? Shifts will return to pending status.')) return
-      await client.patch(`/invoices/${id}/status/`, { status: 'void' })
-    } else {
-      if (!confirm('Delete this draft invoice?')) return
+  const deleteInvoice = async (id, status) => {
+    if (!confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) return
+    try {
+      if (status !== 'draft') {
+        await client.patch(`/invoices/${id}/status/`, { status: 'void' })
+      }
+      await client.delete(`/invoices/${id}/delete/`)
+      setToast({ message: 'Invoice deleted', type: 'success' })
+      load()
+    } catch {
+      setToast({ message: 'Could not delete invoice', type: 'danger' })
     }
-    await client.delete(`/invoices/${id}/delete/`)
-    setToast({ message: 'Invoice deleted', type: 'success' })
-    load()
   }
 
   const downloadExcel = async id => {
@@ -116,7 +118,6 @@ export default function Invoices() {
     <div>
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '' })} />
 
-      {/* Header button */}
       <div className="flex justify-end mb-4">
         <button
           onClick={openModal}
@@ -126,7 +127,6 @@ export default function Invoices() {
         </button>
       </div>
 
-      {/* Invoice cards */}
       {invoices.length === 0 ? (
         <div className="text-center py-20 text-gray-300">
           <i className="bi bi-receipt-cutoff text-5xl block mb-3" />
@@ -174,21 +174,18 @@ export default function Invoices() {
                 >
                   <i className="bi bi-file-earmark-spreadsheet" /> Excel
                 </button>
-                {inv.status !== 'paid' && (
-                  <button
-                    onClick={() => deleteInvoice(inv.id, inv.status === 'draft')}
-                    className="p-1.5 border border-[#E4E2DC] rounded-lg hover:bg-gray-50"
-                  >
-                    <i className="bi bi-trash text-red-400" />
-                  </button>
-                )}
+                <button
+                  onClick={() => deleteInvoice(inv.id, inv.status)}
+                  className="p-1.5 border border-[#E4E2DC] rounded-lg hover:bg-gray-50"
+                >
+                  <i className="bi bi-trash text-red-400" />
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
