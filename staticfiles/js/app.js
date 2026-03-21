@@ -317,10 +317,10 @@ async function loadShifts() {
             <button class="btn btn-sm sit-btn-ghost py-0 px-2" onclick="editShift(${s.id})" title="Edit">
               <i class="bi bi-pencil"></i>
             </button>
-            <button class="btn btn-sm sit-btn-ghost py-0 px-2 text-danger" onclick="deleteShift(${s.id})" title="Delete">
-              <i class="bi bi-trash"></i>
-            </button>
-          ` : `<span class="text-muted" style="font-size:11px">—</span>`}
+          ` : ''}
+          <button class="btn btn-sm sit-btn-ghost py-0 px-2 text-danger" onclick="deleteShift(${s.id})" title="Delete">
+            <i class="bi bi-trash"></i>
+          </button>
         </div>
       </td>
     </tr>

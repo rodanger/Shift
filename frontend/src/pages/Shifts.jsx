@@ -108,7 +108,6 @@ export default function Shifts() {
     }
   }
 
-  // Preview total
   const previewTotal = () => {
     const { start_time, end_time, hourly_rate } = form
     if (!start_time || !end_time || !hourly_rate) return '–'
@@ -138,48 +137,60 @@ export default function Shifts() {
 
       {/* Filters */}
       <div className="bg-white border border-[#E4E2DC] rounded-xl p-4 mb-4">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-          <select
-            className="border border-[#E4E2DC] rounded-lg px-3 py-1.5 text-sm"
-            value={filters.year}
-            onChange={e => setFilters({...filters, year: e.target.value})}
-          >
-            {years.map(y => <option key={y}>{y}</option>)}
-          </select>
-          <select
-            className="border border-[#E4E2DC] rounded-lg px-3 py-1.5 text-sm"
-            value={filters.month}
-            onChange={e => setFilters({...filters, month: e.target.value})}
-          >
-            <option value="">All months</option>
-            {MONTHS.slice(1).map((m,i) => <option key={i+1} value={i+1}>{m}</option>)}
-          </select>
-          <select
-            className="border border-[#E4E2DC] rounded-lg px-3 py-1.5 text-sm"
-            value={filters.status}
-            onChange={e => setFilters({...filters, status: e.target.value})}
-          >
-            <option value="">All status</option>
-            <option value="pending">Pending</option>
-            <option value="invoiced">Invoiced</option>
-            <option value="paid">Paid</option>
-          </select>
-          <input
-            className="border border-[#E4E2DC] rounded-lg px-3 py-1.5 text-sm"
-            placeholder="Search client…"
-            value={filters.client}
-            onChange={e => setFilters({...filters, client: e.target.value})}
-          />
-          <div className="flex gap-2">
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+          <div>
+            <label style={{fontSize:'11px', fontWeight:500, color:'#7A786F', display:'block', marginBottom:'4px'}}>Year</label>
+            <select
+              style={{width:'100%', border:'1px solid #E4E2DC', borderRadius:'8px', padding:'6px 12px', fontSize:'13px'}}
+              value={filters.year}
+              onChange={e => setFilters({...filters, year: e.target.value})}
+            >
+              {years.map(y => <option key={y}>{y}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={{fontSize:'11px', fontWeight:500, color:'#7A786F', display:'block', marginBottom:'4px'}}>Month</label>
+            <select
+              style={{width:'100%', border:'1px solid #E4E2DC', borderRadius:'8px', padding:'6px 12px', fontSize:'13px'}}
+              value={filters.month}
+              onChange={e => setFilters({...filters, month: e.target.value})}
+            >
+              <option value="">All</option>
+              {MONTHS.slice(1).map((m,i) => <option key={i+1} value={i+1}>{m}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={{fontSize:'11px', fontWeight:500, color:'#7A786F', display:'block', marginBottom:'4px'}}>Status</label>
+            <select
+              style={{width:'100%', border:'1px solid #E4E2DC', borderRadius:'8px', padding:'6px 12px', fontSize:'13px'}}
+              value={filters.status}
+              onChange={e => setFilters({...filters, status: e.target.value})}
+            >
+              <option value="">All</option>
+              <option value="pending">Pending</option>
+              <option value="invoiced">Invoiced</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+          <div>
+            <label style={{fontSize:'11px', fontWeight:500, color:'#7A786F', display:'block', marginBottom:'4px'}}>Client</label>
+            <input
+              style={{width:'100%', border:'1px solid #E4E2DC', borderRadius:'8px', padding:'6px 12px', fontSize:'13px'}}
+              placeholder="Search client…"
+              value={filters.client}
+              onChange={e => setFilters({...filters, client: e.target.value})}
+            />
+          </div>
+          <div style={{gridColumn:'1 / -1', display:'flex', gap:'8px'}}>
             <button
               onClick={load}
-              className="flex-1 bg-[#1F3864] text-white rounded-lg px-3 py-1.5 text-sm font-medium"
+              style={{flex:1, background:'#1F3864', color:'#fff', border:'none', borderRadius:'8px', padding:'7px 12px', fontSize:'13px', fontWeight:500, cursor:'pointer'}}
             >
-              <i className="bi bi-funnel-fill mr-1" />Filter
+              <i className="bi bi-funnel-fill" style={{marginRight:'4px'}} />Filter
             </button>
             <button
               onClick={() => { setFilters({ year: new Date().getFullYear(), month: '', status: '', client: '' }); load() }}
-              className="border border-[#E4E2DC] rounded-lg px-3 py-1.5 text-sm"
+              style={{border:'1px solid #E4E2DC', background:'#fff', borderRadius:'8px', padding:'7px 12px', fontSize:'13px', cursor:'pointer'}}
             >
               <i className="bi bi-x-lg" />
             </button>
@@ -195,9 +206,9 @@ export default function Shifts() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-[#E4E2DC] rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+      <div className="bg-white border border-[#E4E2DC] rounded-xl">
+        <div style={{overflowX:'auto'}}>
+          <table className="w-full text-sm" style={{minWidth:'600px'}}>
             <thead>
               <tr className="bg-[#F7F6F3] border-b border-[#E4E2DC]">
                 {['Date','Schedule','Client / Role','Hours','Total','Status','Actions'].map(h => (
