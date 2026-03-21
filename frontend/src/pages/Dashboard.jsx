@@ -51,7 +51,7 @@ export default function Dashboard() {
   const pending = invoices.filter(i => i.status === 'draft' || i.status === 'sent').length
 
   return (
-    <div style={{overflow:'hidden'}}>
+    <div>
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard label="Shifts this month" value={summary?.shift_count ?? '–'} />
@@ -62,61 +62,63 @@ export default function Dashboard() {
 
       <div className="grid lg:grid-cols-7 gap-4">
         {/* Recent shifts */}
-        <div className="lg:col-span-4 bg-white border border-[#E4E2DC] rounded-xl p-5" style={{overflow:'hidden'}}>
+        <div className="lg:col-span-4 bg-white border border-[#E4E2DC] rounded-xl p-5">
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm font-semibold">Recent shifts</span>
             <button onClick={() => navigate('/shifts')} className="text-xs text-[#2E75B6]">View all →</button>
           </div>
           {shifts.length === 0 ? (
             <EmptyState icon="bi-clock" text="No shifts yet" />
-          ) : shifts.slice(0,5).map(s => (
-            <div key={s.id} style={{padding:'8px 0', borderBottom:'1px solid #E4E2DC'}}>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F'}}>{fmtDate(s.date)}</span>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(s.status)}`}>
-                  {labelStatus(s.status)}
-                </span>
-              </div>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'2px'}}>
-                <span style={{fontSize:'13px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'70%'}}>
-                  {s.client || '—'}{s.role ? ` · ${s.role}` : ''}
-                </span>
-                <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'12px', flexShrink:0}}>
-                  {formatMoney(s.total_pay, cur)}
-                </span>
-              </div>
+          ) : (
+            <div style={{overflowX:'auto'}}>
+              <table style={{width:'100%', minWidth:'420px', borderCollapse:'collapse', fontSize:'13px'}}>
+                <tbody>
+                  {shifts.slice(0,5).map(s => (
+                    <tr key={s.id} style={{borderBottom:'1px solid #E4E2DC'}}>
+                      <td style={{padding:'8px 8px 8px 0', fontFamily:'monospace', fontSize:'11px', color:'#7A786F', whiteSpace:'nowrap'}}>{fmtDate(s.date)}</td>
+                      <td style={{padding:'8px', maxWidth:'160px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{s.client || '—'}{s.role ? ` · ${s.role}` : ''}</td>
+                      <td style={{padding:'8px', whiteSpace:'nowrap'}}>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(s.status)}`}>
+                          {labelStatus(s.status)}
+                        </span>
+                      </td>
+                      <td style={{padding:'8px 0 8px 8px', fontFamily:'monospace', fontWeight:600, fontSize:'12px', whiteSpace:'nowrap', textAlign:'right'}}>{formatMoney(s.total_pay, cur)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Recent invoices */}
-        <div className="lg:col-span-3 bg-white border border-[#E4E2DC] rounded-xl p-5" style={{overflow:'hidden'}}>
+        <div className="lg:col-span-3 bg-white border border-[#E4E2DC] rounded-xl p-5">
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm font-semibold">Recent invoices</span>
             <button onClick={() => navigate('/invoices')} className="text-xs text-[#2E75B6]">View all →</button>
           </div>
           {invoices.length === 0 ? (
             <EmptyState icon="bi-receipt" text="No invoices yet" />
-          ) : invoices.slice(0,4).map(inv => (
-            <div key={inv.id} style={{padding:'8px 0', borderBottom:'1px solid #E4E2DC'}}>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'60%'}}>
-                  {inv.invoice_number}
-                </span>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(inv.status)}`}>
-                  {inv.status}
-                </span>
-              </div>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'2px'}}>
-                <span style={{fontSize:'13px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'70%'}}>
-                  {inv.client_name || '—'}
-                </span>
-                <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'12px', flexShrink:0}}>
-                  {formatMoney(inv.total, cur)}
-                </span>
-              </div>
+          ) : (
+            <div style={{overflowX:'auto'}}>
+              <table style={{width:'100%', minWidth:'360px', borderCollapse:'collapse', fontSize:'13px'}}>
+                <tbody>
+                  {invoices.slice(0,4).map(inv => (
+                    <tr key={inv.id} style={{borderBottom:'1px solid #E4E2DC'}}>
+                      <td style={{padding:'8px 8px 8px 0', fontFamily:'monospace', fontSize:'11px', color:'#7A786F', whiteSpace:'nowrap'}}>{inv.invoice_number}</td>
+                      <td style={{padding:'8px', maxWidth:'120px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{inv.client_name || '—'}</td>
+                      <td style={{padding:'8px', whiteSpace:'nowrap'}}>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(inv.status)}`}>
+                          {inv.status}
+                        </span>
+                      </td>
+                      <td style={{padding:'8px 0 8px 8px', fontFamily:'monospace', fontWeight:600, fontSize:'12px', whiteSpace:'nowrap', textAlign:'right'}}>{formatMoney(inv.total, cur)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
