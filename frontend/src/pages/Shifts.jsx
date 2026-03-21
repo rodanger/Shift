@@ -226,16 +226,16 @@ export default function Shifts() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {s.status === 'pending' ? (
-                      <div className="flex gap-1 justify-center">
+                    <div className="flex gap-1 justify-center">
+                      {s.status === 'pending' && (
                         <button onClick={() => openEdit(s.id)} className="p-1.5 rounded hover:bg-gray-100">
                           <i className="bi bi-pencil text-gray-500" />
                         </button>
-                        <button onClick={() => deleteShift(s.id)} className="p-1.5 rounded hover:bg-gray-100">
-                          <i className="bi bi-trash text-red-400" />
-                        </button>
-                      </div>
-                    ) : <span className="text-gray-300 text-center block">—</span>}
+                      )}
+                      <button onClick={() => deleteShift(s.id)} className="p-1.5 rounded hover:bg-gray-100">
+                        <i className="bi bi-trash text-red-400" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
