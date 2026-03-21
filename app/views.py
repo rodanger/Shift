@@ -75,11 +75,8 @@ class ShiftDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         shift = self.get_object()
-        if shift.status != 'pending':
-            return Response(
-                {'detail': 'Only pending shifts can be deleted.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if shift.invoice:
+            shift.invoice.recalculate_totals()
         return super().destroy(request, *args, **kwargs)
 
 
