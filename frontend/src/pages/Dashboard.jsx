@@ -70,15 +70,21 @@ export default function Dashboard() {
           {shifts.length === 0 ? (
             <EmptyState icon="bi-clock" text="No shifts yet" />
           ) : shifts.slice(0,5).map(s => (
-            <div key={s.id} style={{display:'flex', alignItems:'center', gap:'8px', padding:'8px 0', borderBottom:'1px solid #E4E2DC', overflow:'hidden'}}>
-              <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F', minWidth:'72px', flexShrink:0}}>{fmtDate(s.date)}</span>
-              <span style={{flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', fontSize:'13px'}}>{s.client || '—'}{s.role ? ` · ${s.role}` : ''}</span>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(s.status)}`} style={{flexShrink:0}}>
-                {labelStatus(s.status)}
-              </span>
-              <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'11px', flexShrink:0}}>
-                {formatMoney(s.total_pay, cur)}
-              </span>
+            <div key={s.id} style={{padding:'8px 0', borderBottom:'1px solid #E4E2DC'}}>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F'}}>{fmtDate(s.date)}</span>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(s.status)}`}>
+                  {labelStatus(s.status)}
+                </span>
+              </div>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'2px'}}>
+                <span style={{fontSize:'13px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'70%'}}>
+                  {s.client || '—'}{s.role ? ` · ${s.role}` : ''}
+                </span>
+                <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'12px', flexShrink:0}}>
+                  {formatMoney(s.total_pay, cur)}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -92,15 +98,23 @@ export default function Dashboard() {
           {invoices.length === 0 ? (
             <EmptyState icon="bi-receipt" text="No invoices yet" />
           ) : invoices.slice(0,4).map(inv => (
-            <div key={inv.id} style={{display:'flex', alignItems:'center', gap:'8px', padding:'8px 0', borderBottom:'1px solid #E4E2DC', overflow:'hidden'}}>
-              <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F', flexShrink:0, maxWidth:'90px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{inv.invoice_number}</span>
-              <span style={{flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', fontSize:'13px'}}>{inv.client_name || '—'}</span>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(inv.status)}`} style={{flexShrink:0}}>
-                {inv.status}
-              </span>
-              <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'11px', flexShrink:0}}>
-                {formatMoney(inv.total, cur)}
-              </span>
+            <div key={inv.id} style={{padding:'8px 0', borderBottom:'1px solid #E4E2DC'}}>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'60%'}}>
+                  {inv.invoice_number}
+                </span>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(inv.status)}`}>
+                  {inv.status}
+                </span>
+              </div>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'2px'}}>
+                <span style={{fontSize:'13px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'70%'}}>
+                  {inv.client_name || '—'}
+                </span>
+                <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'12px', flexShrink:0}}>
+                  {formatMoney(inv.total, cur)}
+                </span>
+              </div>
             </div>
           ))}
         </div>
