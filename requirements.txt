@@ -1,0 +1,11 @@
+Django==6.0
+djangorestframework==3.16.1
+djangorestframework-simplejwt==5.5.1
+django-cors-headers==4.9.0
+psycopg2-binary==2.9.11
+openpyxl==3.1.5
+gunicorn==21.2.0
+whitenoise==6.7.0
+asgiref==3.11.0
+sqlparse==0.5.5
+PyJWT==2.10.1

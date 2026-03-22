@@ -1,18 +1,12 @@
-"""
-Django settings for shift project.
-"""
-
 import os
 from pathlib import Path
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-change-this-in-production'
-
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-production')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,18 +15,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-
-    # Local
     'app',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -80,11 +71,8 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ── Django REST Framework ──────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -94,20 +82,16 @@ REST_FRAMEWORK = {
     ),
 }
 
-# ── Simple JWT ─────────────────────────────────────────────────────
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# ── CORS ───────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:5500',
-    'http://localhost:5500',
-]
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
