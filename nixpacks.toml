@@ -1,10 +1,14 @@
 [phases.setup]
 nixPkgs = [
+  "glib",
   "pango",
   "cairo",
   "gdk-pixbuf",
   "libffi",
-  "shared-mime-info",
   "fontconfig",
   "freetype",
+  "gobject-introspection",
 ]
+
+[variables]
+LD_LIBRARY_PATH = "/nix/store"
