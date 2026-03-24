@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      color: #1a1a2e;
+      padding: 48px;
+      background: #fff;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 3px solid #2D6A4F;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2D6A4F;
+      letter-spacing: -0.5px;
+    }
+
+    .header .invoice-meta {
+      text-align: right;
+      line-height: 1.7;
+      color: #555;
+    }
+
+    .invoice-meta strong {
+      color: #1a1a2e;
+    }
+
+    .info-grid {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 36px;
+    }
+
+    .info-box {
+      flex: 1;
+      background: #f5f5ff;
+      border-left: 4px solid #2D6A4F;
+      padding: 16px 20px;
+      border-radius: 4px;
+    }
+
+    .info-box h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #2D6A4F;
+      margin-bottom: 8px;
+    }
+
+    .info-box p {
+      line-height: 1.7;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 32px;
+    }
+
+    thead tr {
+      background: #2D6A4F;
+      color: #fff;
+    }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8f8ff;
+    }
+
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e8e8f0;
+      color: #333;
+    }
+
+    .totals {
+      margin-left: auto;
+      width: 280px;
+      margin-bottom: 40px;
+    }
+
+    .totals table {
+      margin-bottom: 0;
+    }
+
+    .totals td {
+      padding: 8px 14px;
+      border: none;
+    }
+
+    .totals .label {
+      color: #666;
+    }
+
+    .totals .value {
+      text-align: right;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .totals .total-row td {
+      background: #2D6A4F;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 2px;
+    }
+
+    .notes {
+      background: #fffbf0;
+      border-left: 4px solid #f59e0b;
+      padding: 14px 18px;
+      border-radius: 4px;
+      margin-bottom: 40px;
+      color: #555;
+    }
+
+    .notes h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #f59e0b;
+      margin-bottom: 6px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      padding-top: 20px;
+      border-top: 1px solid #e8e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>INVOICE</h1>
+    <div class="invoice-meta">
+      <p><strong>{{ invoice.invoice_number }}</strong></p>
+      <p>Issued: {{ invoice.issued_date }}</p>
+      <p>Period: {{ invoice.period_month|stringformat:"02d" }} / {{ invoice.period_year }}</p>
+      <p>Status: {{ invoice.status|upper }}</p>
+      {% if invoice.due_date %}
+      <p>Due: {{ invoice.due_date }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-box">
+      <h3>Billed To</h3>
+      <p><strong>{{ invoice.client_name|default:"—" }}</strong></p>
+      <p>{{ invoice.client_address|default:"" }}</p>
+    </div>
+    <div class="info-box">
+      <h3>From</h3>
+      <p><strong>{{ invoice.user.get_full_name|default:invoice.user.username }}</strong></p>
+      <p>{{ invoice.user.email }}</p>
+      {% if invoice.user.profile.address %}
+      <p>{{ invoice.user.profile.address }}</p>
+      {% endif %}
+      {% if invoice.user.profile.phone %}
+      <p>{{ invoice.user.profile.phone }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if invoice.shifts.all %}
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Client</th>
+        <th>Hours</th>
+        <th>Rate ($/hr)</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for shift in invoice.shifts.all %}
+      <tr>
+        <td>{{ shift.date }}</td>
+        <td>{{ shift.client|default:"—" }}</td>
+        <td>{{ shift.hours_worked }}</td>
+        <td>${{ shift.hourly_rate }}</td>
+        <td>${{ shift.total_pay }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <div class="totals">
+    <table>
+      <tr>
+        <td class="label">Subtotal</td>
+        <td class="value">${{ invoice.subtotal }}</td>
+      </tr>
+      {% if invoice.tax_rate %}
+      <tr>
+        {# tax_rate is stored as a decimal e.g. 0.13 — multiply by 100 for display #}
+        <td class="label">Tax ({% widthratio invoice.tax_rate 1 100 %}%)</td>
+        <td class="value">${{ invoice.tax_amount }}</td>
+      </tr>
+      {% endif %}
+      <tr class="total-row">
+        <td>TOTAL</td>
+        <td style="text-align:right">${{ invoice.total }}</td>
+      </tr>
+    </table>
+  </div>
+
+  {% if invoice.notes %}
+  <div class="notes">
+    <h3>Notes</h3>
+    <p>{{ invoice.notes }}</p>
+  </div>
+  {% endif %}
+
+  {% if invoice.user.profile.bank_details %}
+  <div class="notes" style="border-color: #2D6A4F; background: #f5f5ff;">
+    <h3 style="color: #2D6A4F;">Payment Details</h3>
+    <p>{{ invoice.user.profile.bank_details }}</p>
+  </div>
+  {% endif %}
+
+  <div class="footer">
+    Generated by HourTrack
+  </div>
+
+</body>
+</html>

@@ -6,6 +6,10 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.template.loader import render_to_string
+from weasyprint import HTML
+
+
 
 from .models import Shift, Invoice, UserProfile
 from .serializers import (
@@ -238,4 +242,26 @@ class InvoiceExcelView(APIView):
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         )
         response['Content-Disposition'] = f'attachment; filename="{invoice.invoice_number}.xlsx"'
+        return response
+    
+class InvoicePDFView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            invoice = (
+                Invoice.objects
+                .prefetch_related('shifts')
+                .select_related('user')
+                .get(pk=pk, user=request.user)
+            )
+        except Invoice.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        html_string = render_to_string('invoice_pdf.html', {'invoice': invoice})
+        pdf_file    = HTML(string=html_string).write_pdf()
+
+        filename = f"invoice_{invoice.period_month:02d}_{invoice.period_year}.pdf"
+        response = HttpResponse(content=pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response

@@ -114,6 +114,21 @@ export default function Invoices() {
     URL.revokeObjectURL(url)
   }
 
+  const downloadPDF = async id => {
+    const token = localStorage.getItem('sit_access')
+    const res = await fetch(`/api/invoices/${id}/export/pdf/`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (!res.ok) { setToast({ message: 'Error downloading PDF', type: 'danger' }); return }
+    const blob = await res.blob()
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `invoice-${id}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div>
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '' })} />
@@ -173,6 +188,12 @@ export default function Invoices() {
                   className="flex items-center gap-1 px-3 py-1.5 border border-[#E4E2DC] rounded-lg text-xs font-medium hover:bg-[#F7F6F3]"
                 >
                   <i className="bi bi-file-earmark-spreadsheet" /> Excel
+                </button>
+                <button
+                  onClick={() => downloadPDF(inv.id)}
+                  className="flex items-center gap-1 px-3 py-1.5 border border-[#E4E2DC] rounded-lg text-xs font-medium hover:bg-[#F7F6F3]"
+                >
+                  <i className="bi bi-file-earmark-pdf" /> PDF
                 </button>
                 <button
                   onClick={() => deleteInvoice(inv.id, inv.status)}

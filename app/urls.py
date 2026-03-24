@@ -21,4 +21,5 @@ urlpatterns = [
     path('invoices/<int:pk>/status/',       views.InvoiceStatusView.as_view(),   name='invoice-status'),
     path('invoices/<int:pk>/delete/',       views.InvoiceDeleteView.as_view(),   name='invoice-delete'),
     path('invoices/<int:pk>/export/excel/', views.InvoiceExcelView.as_view(),    name='invoice-excel'),
+    path('invoices/<int:pk>/export/pdf/',   views.InvoicePDFView.as_view(),      name='invoice-pdf'),
 ]

@@ -62,43 +62,63 @@ export default function Dashboard() {
 
       <div className="grid lg:grid-cols-7 gap-4">
         {/* Recent shifts */}
-        <div className="lg:col-span-4 bg-white border border-[#E4E2DC] rounded-xl p-4">
-          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'12px'}}>
-            <span style={{fontSize:'14px', fontWeight:600}}>Recent shifts</span>
-            <button onClick={() => navigate('/shifts')} style={{fontSize:'12px', color:'#2E75B6', background:'none', border:'none', cursor:'pointer'}}>View all →</button>
+        <div className="lg:col-span-4 bg-white border border-[#E4E2DC] rounded-xl p-5">
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm font-semibold">Recent shifts</span>
+            <button onClick={() => navigate('/shifts')} className="text-xs text-[#2E75B6]">View all →</button>
           </div>
           {shifts.length === 0 ? (
             <EmptyState icon="bi-clock" text="No shifts yet" />
-          ) : shifts.slice(0,5).map(s => (
-            <div key={s.id} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #E4E2DC', gap:'6px'}}>
-              <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F', flexShrink:0}}>{fmtDate(s.date)}</span>
-              <span style={{flex:1, fontSize:'12px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{s.client || '—'}{s.role ? ` · ${s.role}` : ''}</span>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(s.status)}`} style={{flexShrink:0}}>
-                {labelStatus(s.status)}
-              </span>
-              <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'11px', flexShrink:0}}>{formatMoney(s.total_pay, cur)}</span>
+          ) : (
+            <div style={{overflowX:'auto'}}>
+              <table style={{width:'100%', minWidth:'420px', borderCollapse:'collapse', fontSize:'13px'}}>
+                <tbody>
+                  {shifts.slice(0,5).map(s => (
+                    <tr key={s.id} style={{borderBottom:'1px solid #E4E2DC'}}>
+                      <td style={{padding:'8px 8px 8px 0', fontFamily:'monospace', fontSize:'11px', color:'#7A786F', whiteSpace:'nowrap'}}>{fmtDate(s.date)}</td>
+                      <td style={{padding:'8px', maxWidth:'160px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{s.client || '—'}{s.role ? ` · ${s.role}` : ''}</td>
+                      <td style={{padding:'8px', whiteSpace:'nowrap'}}>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(s.status)}`}>
+                          {labelStatus(s.status)}
+                        </span>
+                      </td>
+                      <td style={{padding:'8px 0 8px 8px', fontFamily:'monospace', fontWeight:600, fontSize:'12px', whiteSpace:'nowrap', textAlign:'right'}}>{formatMoney(s.total_pay, cur)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Recent invoices */}
-        <div className="lg:col-span-3 bg-white border border-[#E4E2DC] rounded-xl p-4">
-          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'12px'}}>
-            <span style={{fontSize:'14px', fontWeight:600}}>Recent invoices</span>
-            <button onClick={() => navigate('/invoices')} style={{fontSize:'12px', color:'#2E75B6', background:'none', border:'none', cursor:'pointer'}}>View all →</button>
+        <div className="lg:col-span-3 bg-white border border-[#E4E2DC] rounded-xl p-5">
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm font-semibold">Recent invoices</span>
+            <button onClick={() => navigate('/invoices')} className="text-xs text-[#2E75B6]">View all →</button>
           </div>
           {invoices.length === 0 ? (
             <EmptyState icon="bi-receipt" text="No invoices yet" />
-          ) : invoices.slice(0,4).map(inv => (
-            <div key={inv.id} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid #E4E2DC', gap:'6px'}}>
-              <span style={{fontFamily:'monospace', fontSize:'11px', color:'#7A786F', flexShrink:0, maxWidth:'80px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{inv.invoice_number}</span>
-              <span style={{flex:1, fontSize:'12px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{inv.client_name || '—'}</span>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(inv.status)}`} style={{flexShrink:0}}>
-                {inv.status}
-              </span>
-              <span style={{fontFamily:'monospace', fontWeight:600, fontSize:'11px', flexShrink:0}}>{formatMoney(inv.total, cur)}</span>
+          ) : (
+            <div style={{overflowX:'auto'}}>
+              <table style={{width:'100%', minWidth:'360px', borderCollapse:'collapse', fontSize:'13px'}}>
+                <tbody>
+                  {invoices.slice(0,4).map(inv => (
+                    <tr key={inv.id} style={{borderBottom:'1px solid #E4E2DC'}}>
+                      <td style={{padding:'8px 8px 8px 0', fontFamily:'monospace', fontSize:'11px', color:'#7A786F', whiteSpace:'nowrap'}}>{inv.invoice_number}</td>
+                      <td style={{padding:'8px', maxWidth:'120px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{inv.client_name || '—'}</td>
+                      <td style={{padding:'8px', whiteSpace:'nowrap'}}>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass(inv.status)}`}>
+                          {inv.status}
+                        </span>
+                      </td>
+                      <td style={{padding:'8px 0 8px 8px', fontFamily:'monospace', fontWeight:600, fontSize:'12px', whiteSpace:'nowrap', textAlign:'right'}}>{formatMoney(inv.total, cur)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
