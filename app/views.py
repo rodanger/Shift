@@ -6,10 +6,6 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.template.loader import render_to_string
-from weasyprint import HTML
-
-
 
 from .models import Shift, Invoice, UserProfile
 from .serializers import (
@@ -243,7 +239,8 @@ class InvoiceExcelView(APIView):
         )
         response['Content-Disposition'] = f'attachment; filename="{invoice.invoice_number}.xlsx"'
         return response
-    
+
+
 class InvoicePDFView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -257,6 +254,9 @@ class InvoicePDFView(APIView):
             )
         except Invoice.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        from django.template.loader import render_to_string
+        from weasyprint import HTML
 
         html_string = render_to_string('invoice_pdf.html', {'invoice': invoice})
         pdf_file    = HTML(string=html_string).write_pdf()
