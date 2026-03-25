@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["pango", "cairo", "gdk-pixbuf", "libffi", "fontconfig", "nodejs_20"]
+nixPkgs = ["pango", "cairo", "gdk-pixbuf", "libffi", "fontconfig", "nodejs_20", "gobject-introspection", "harfbuzz", "freetype"]
 
 [phases.build]
 cmds = [
