@@ -256,15 +256,12 @@ class InvoicePDFView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         from django.template.loader import render_to_string
-        from xhtml2pdf import pisa
-        import io
+        from weasyprint import HTML
 
         html_string = render_to_string('invoice_pdf.html', {'invoice': invoice})
-        pdf_buffer  = io.BytesIO()
-        pisa.CreatePDF(html_string, dest=pdf_buffer)
-        pdf_buffer.seek(0)
+        pdf_file    = HTML(string=html_string).write_pdf()
 
         filename = f"invoice_{invoice.period_month:02d}_{invoice.period_year}.pdf"
-        response = HttpResponse(content=pdf_buffer.read(), content_type='application/pdf')
+        response = HttpResponse(content=pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
