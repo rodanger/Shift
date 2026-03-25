@@ -1,9 +1,0 @@
-[phases.setup]
-nixPkgs = ["pango", "cairo", "gdk-pixbuf", "libffi", "fontconfig", "nodejs_20", "gobject-introspection", "harfbuzz", "freetype"]
-
-[phases.build]
-cmds = [
-  "cd frontend && npm install && npm run build",
-  "cp -r frontend/dist/assets static/",
-  "cp frontend/dist/index.html templates/index.html"
-]
