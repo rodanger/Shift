@@ -27,10 +27,9 @@ COPY frontend/package*.json ./frontend/
 RUN cd frontend && npm install
 
 COPY frontend/ ./frontend/
-RUN mkdir -p /app/static /app/templates && \
-    cd frontend && npm run build && \
-    cp -r dist/assets /app/static/ && \
-    cp dist/index.html /app/templates/index.html
+RUN cd frontend && npm run build && \
+    cp -r dist/assets ../static/ && \
+    cp dist/index.html ../templates/index.html
 
 # Copy the rest of the project
 COPY . .
