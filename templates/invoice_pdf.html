@@ -7,78 +7,114 @@
 
     body {
       font-family: Helvetica, Arial, sans-serif;
-      font-size: 13px;
-      color: #1a1a2e;
-      padding: 40px;
+      font-size: 12px;
+      color: #2d3748;
       background: #fff;
+      padding: 50px;
     }
 
-    /* ── Header ── */
-    .header {
+    .top-bar {
+      background-color: #40916c;
+      height: 5px;
       width: 100%;
-      border-bottom: 3px solid #40916c;
-      padding-bottom: 20px;
-      margin-bottom: 30px;
-    }
-
-    .header-left {
-      float: left;
-    }
-
-    .header-right {
-      float: right;
-      text-align: right;
+      margin-bottom: 36px;
     }
 
     .clearfix { clear: both; }
+    .float-left  { float: left; }
+    .float-right { float: right; }
 
-    .header h1 {
-      font-size: 30px;
+    .invoice-title {
+      font-size: 42px;
       font-weight: bold;
       color: #40916c;
+      letter-spacing: -1px;
+      line-height: 1;
     }
 
-    .invoice-meta {
-      line-height: 1.8;
-      color: #555;
-      font-size: 12px;
-    }
-
-    .invoice-meta strong {
-      color: #1a1a2e;
-    }
-
-    /* ── Info Section ── */
-    .info-section {
-      width: 100%;
-      margin-bottom: 30px;
-    }
-
-    .info-box {
-      width: 45%;
-      background: #f5f5ff;
-      border-left: 4px solid #40916c;
-      padding: 12px 16px;
-    }
-
-    .info-box-left  { float: left; }
-    .info-box-right { float: right; }
-
-    .info-box h3 {
+    .company-label {
       font-size: 10px;
       text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #a0aec0;
+      margin-top: 6px;
+    }
+
+    .invoice-meta { text-align: right; }
+
+    .invoice-number {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1a202c;
+      margin-bottom: 4px;
+    }
+
+    .invoice-meta p {
+      font-size: 11px;
+      color: #718096;
+      line-height: 1.9;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
       letter-spacing: 1px;
+      background-color: #c6f6d5;
+      color: #276749;
+      margin-top: 4px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 28px 0;
+    }
+
+    .info-card {
+      width: 45%;
+      padding: 16px 18px;
+      border: 1px solid #e2e8f0;
+      border-top: 3px solid #40916c;
+      background-color: #f7fffe;
+    }
+
+    .info-card-left  { float: left; }
+    .info-card-right { float: right; }
+
+    .info-card-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
       color: #40916c;
-      margin-bottom: 6px;
+      font-weight: bold;
+      margin-bottom: 8px;
     }
 
-    .info-box p {
-      line-height: 1.7;
-      color: #333;
+    .info-card p {
       font-size: 12px;
+      color: #4a5568;
+      line-height: 1.8;
     }
 
-    /* ── Table ── */
+    .info-card .name {
+      font-size: 13px;
+      font-weight: bold;
+      color: #1a202c;
+    }
+
+    .section-title {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #a0aec0;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -91,177 +127,189 @@
     }
 
     thead th {
-      padding: 9px 12px;
+      padding: 10px 14px;
       text-align: left;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    tbody tr {
-      background-color: #ffffff;
-    }
+    thead th.text-right { text-align: right; }
 
-    tbody tr.alt {
-      background-color: #f8f8ff;
-    }
+    tbody tr { background-color: #ffffff; }
+    tbody tr.alt { background-color: #f0faf5; }
 
     tbody td {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e8e8f0;
-      color: #333;
+      padding: 9px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4a5568;
       font-size: 12px;
     }
 
-    /* ── Totals ── */
-    .totals-table {
-      width: 280px;
+    tbody td.text-right { text-align: right; }
+    tbody td.bold { font-weight: bold; color: #1a202c; }
+
+    .totals-wrapper {
       float: right;
-      margin-bottom: 30px;
+      width: 260px;
+      margin-bottom: 32px;
     }
 
-    .totals-table table {
-      margin-bottom: 0;
-    }
+    .totals-wrapper table { margin-bottom: 0; }
 
-    .totals-table td {
-      padding: 7px 12px;
+    .totals-wrapper td {
+      padding: 8px 14px;
       border: none;
       font-size: 12px;
+      border-bottom: 1px solid #e2e8f0;
     }
 
-    .totals-table .label { color: #666; }
-    .totals-table .value { text-align: right; font-weight: bold; color: #1a1a2e; }
+    .totals-wrapper .t-label { color: #718096; }
+    .totals-wrapper .t-value { text-align: right; font-weight: bold; color: #2d3748; }
 
-    .total-row td {
+    .totals-wrapper .total-row td {
       background-color: #40916c;
       color: #ffffff;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
+      border: none;
     }
 
-    /* ── Notes ── */
-    .notes {
-      background: #fffbf0;
-      border-left: 4px solid #f59e0b;
-      padding: 12px 16px;
-      margin-bottom: 30px;
-      font-size: 12px;
-      color: #555;
+    .totals-wrapper .total-row .t-value { color: #ffffff; }
+
+    .notes-box {
+      background-color: #fffbf0;
+      border-left: 3px solid #f6ad55;
+      padding: 14px 18px;
+      margin-bottom: 32px;
     }
 
-    .notes h3 {
-      font-size: 10px;
+    .notes-label {
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #f59e0b;
-      margin-bottom: 5px;
+      letter-spacing: 1.5px;
+      color: #dd6b20;
+      font-weight: bold;
+      margin-bottom: 6px;
     }
 
-    /* ── Footer ── */
+    .notes-box p {
+      color: #744210;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .footer-bar {
+      background-color: #40916c;
+      height: 3px;
+      width: 100%;
+      margin-bottom: 14px;
+    }
+
     .footer {
       text-align: center;
       font-size: 10px;
-      color: #aaa;
-      padding-top: 16px;
-      border-top: 1px solid #e8e8f0;
+      color: #a0aec0;
     }
+
+    .footer span { color: #40916c; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <h1>INVOICE</h1>
-    </div>
-    <div class="header-right">
-      <div class="invoice-meta">
-        <p><strong>{{ invoice.invoice_number }}</strong></p>
-        <p>Period: {{ invoice.period_month|stringformat:"02d" }} / {{ invoice.period_year }}</p>
-        <p>Status: {{ invoice.status|upper }}</p>
-        {% if invoice.due_date %}<p>Due: {{ invoice.due_date }}</p>{% endif %}
-      </div>
-    </div>
-    <div class="clearfix"></div>
-  </div>
+  <div class="top-bar"></div>
 
-  <!-- Info -->
-  <div class="info-section">
-    <div class="info-box info-box-left">
-      <h3>Billed To</h3>
-      <p><strong>{{ invoice.client_name|default:"—" }}</strong></p>
+  <div class="float-left">
+    <div class="invoice-title">INVOICE</div>
+    <div class="company-label">HourTrack &mdash; Shift &amp; Invoice Tracker</div>
+  </div>
+  <div class="float-right invoice-meta">
+    <div class="invoice-number">{{ invoice.invoice_number }}</div>
+    <p>Period: {{ invoice.period_month|stringformat:"02d" }} / {{ invoice.period_year }}</p>
+    {% if invoice.due_date %}<p>Due date: {{ invoice.due_date }}</p>{% endif %}
+    <div class="status-badge">{{ invoice.status }}</div>
+  </div>
+  <div class="clearfix"></div>
+
+  <hr class="divider">
+
+  <div>
+    <div class="info-card info-card-left">
+      <div class="info-card-label">Billed To</div>
+      <p class="name">{{ invoice.client_name|default:"&mdash;" }}</p>
       <p>{{ invoice.client_address|default:"" }}</p>
     </div>
-    <div class="info-box info-box-right">
-      <h3>From</h3>
-      <p><strong>{{ invoice.user.get_full_name|default:invoice.user.username }}</strong></p>
+    <div class="info-card info-card-right">
+      <div class="info-card-label">From</div>
+      <p class="name">{{ invoice.user.get_full_name|default:invoice.user.username }}</p>
       <p>{{ invoice.user.email }}</p>
     </div>
     <div class="clearfix"></div>
   </div>
 
-  <!-- Shifts Table -->
+  <hr class="divider">
+
   {% if invoice.shifts.all %}
+  <div class="section-title">Work Log</div>
   <table>
     <thead>
       <tr>
         <th>Date</th>
         <th>Client</th>
-        <th>Hours</th>
-        <th>Rate ($/hr)</th>
-        <th>Amount</th>
+        <th class="text-right">Hours</th>
+        <th class="text-right">Rate</th>
+        <th class="text-right">Amount</th>
       </tr>
     </thead>
     <tbody>
       {% for shift in invoice.shifts.all %}
       <tr {% if forloop.counter|divisibleby:2 %}class="alt"{% endif %}>
         <td>{{ shift.date }}</td>
-        <td>{{ shift.client|default:"—" }}</td>
-        <td>{{ shift.hours_worked }}</td>
-        <td>${{ shift.hourly_rate }}</td>
-        <td>${{ shift.total_pay }}</td>
+        <td>{{ shift.client|default:"&mdash;" }}</td>
+        <td class="text-right">{{ shift.hours_worked }} hrs</td>
+        <td class="text-right">${{ shift.hourly_rate }}/hr</td>
+        <td class="text-right bold">${{ shift.total_pay }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% endif %}
 
-  <!-- Totals -->
-  <div class="totals-table">
+  <div class="totals-wrapper">
     <table>
       <tr>
-        <td class="label">Total Hours</td>
-        <td class="value">{{ invoice.total_hours }} hrs</td>
+        <td class="t-label">Total Hours</td>
+        <td class="t-value">{{ invoice.total_hours }} hrs</td>
       </tr>
       <tr>
-        <td class="label">Subtotal</td>
-        <td class="value">${{ invoice.subtotal }}</td>
+        <td class="t-label">Subtotal</td>
+        <td class="t-value">${{ invoice.subtotal }}</td>
       </tr>
       {% if invoice.tax_rate %}
       <tr>
-        <td class="label">Tax ({{ invoice.tax_rate }}%)</td>
-        <td class="value">${{ invoice.tax_amount }}</td>
+        <td class="t-label">Tax ({{ invoice.tax_rate }}%)</td>
+        <td class="t-value">${{ invoice.tax_amount }}</td>
       </tr>
       {% endif %}
       <tr class="total-row">
-        <td>TOTAL</td>
-        <td class="value">${{ invoice.total_amount }}</td>
+        <td>Total Due</td>
+        <td class="t-value">${{ invoice.total_amount }}</td>
       </tr>
     </table>
   </div>
   <div class="clearfix"></div>
 
-  <!-- Notes -->
   {% if invoice.notes %}
-  <div class="notes">
-    <h3>Notes</h3>
+  <div class="notes-box">
+    <div class="notes-label">Notes</div>
     <p>{{ invoice.notes }}</p>
   </div>
   {% endif %}
 
-  <!-- Footer -->
+  <div class="footer-bar"></div><br>
   <div class="footer">
-    Generated by HourTrack &copy; {{ current_year }}
+    Generated by <span>HourTrack</span> &mdash; Shift &amp; Invoice Tracker
   </div>
 
 </body>
