@@ -1,8 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useState, createContext, useContext } from 'react'
-import icon from '../assets/icon.png'
-
+import icon from '../assets/logo.png'
 const links = [
   { to: '/',         label: 'Dashboard', icon: 'bi-grid-1x2-fill' },
   { to: '/shifts',   label: 'Shifts',    icon: 'bi-clock-fill' },
