@@ -404,3 +404,10 @@ a { cursor: pointer; text-decoration: none; }
   font-weight: 600; margin-left: auto;
   font-size: 13px;
 }
+
+
+/* ── Global overflow fix ──────────────────────────────── */
+html, body, #root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
