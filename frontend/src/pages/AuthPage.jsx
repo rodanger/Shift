@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client.jsx'
-import icon from '../assets/logo.png'
+import icon from '../assets/mark.png'
 
 export default function AuthPage() {
   const { login } = useAuth()
