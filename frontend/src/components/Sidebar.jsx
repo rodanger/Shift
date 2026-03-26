@@ -44,7 +44,7 @@ export default function Sidebar() {
       `}>
         <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
           <img src={icon} width="32" height="32" style={{borderRadius:'8px'}} />
-          <span className="text-white font-semibold tracking-wide text-sm">In/Out</span>
+          <span className="text-white font-semibold tracking-wide text-sm">HourTrack</span>
           <button className="ml-auto text-white/50 lg:hidden" onClick={close}>
             <i className="bi bi-x-lg" />
           </button>
