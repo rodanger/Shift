@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client.jsx'
+import icon from '../assets/logo.png'
 
 export default function AuthPage() {
   const { login } = useAuth()
@@ -51,16 +52,17 @@ export default function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1A1916] to-[#1F3864] px-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10">
 
-        {/* Logo */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-[#1F3864] rounded-xl flex items-center justify-center">
-            <i className="bi bi-calendar2-week-fill text-white text-xl" />
+        {/* Logo */}    
+
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-[#1F3864] rounded-xl flex items-center justify-center">
+              <img src={icon} width="32" height="32" style={{borderRadius:'8px'}} />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold">HourTrack</h1>
+              <p className="text-xs text-gray-400">Tracker for hourly workers</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-semibold">Shift & Invoice</h1>
-            <p className="text-xs text-gray-400">Tracker for hourly workers</p>
-          </div>
-        </div>
 
         {/* Tabs */}
         <div className="flex bg-[#F7F6F3] rounded-lg p-1 gap-1 mb-6">
